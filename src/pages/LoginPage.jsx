@@ -1,36 +1,48 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import assets from "../assets/assets";
+import { AuthContext } from "../../context/AuthContext";
 
 const LoginPage = () => {
-  const [currentState, setCurrentState] = useState("Sign up");
+  const [currState, setCurrState] = useState("Sign up");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [bio, setBio] = useState(""); // ✅ Capital B for convention
+  const [bio, setBio] = useState("");
   const [isDataSubmitted, setIsDataSubmitted] = useState(false);
+  const { login } = useContext(AuthContext);
 
-  const onSubmitHandler = (e) => {
+  const onSubmitHandler = async (e) => {
     e.preventDefault();
-    if (currentState === "Sign up" && !isDataSubmitted) {
+
+    if (currState === "Sign up" && !isDataSubmitted) {
       setIsDataSubmitted(true);
       return;
     }
-    // You can add login/signup logic here later
-  }; // ✅ FIX: closed function properly
+
+    try {
+      await login(currState === "Sign up" ? "signup" : "login", {
+        fullName,
+        email,
+        password,
+        bio,
+      });
+    } catch (error) {
+      console.error("Login/Signup failed:", error);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-cover flex items-center justify-center gap-8 sm:justify-evenly max-sm:flex-col backdrop-blur-2xl">
-      {/* img */}
+    <div className="min-h-screen bg-cover bg-center flex items-center justify-center gap-8 sm:justify-evenly max-sm:flex-col backdrop-blur-2xl">
+      {/* Left Section */}
       <img src={assets.logo_big} alt="" className="w-[min(30vw,250px)]" />
 
-      {/* right */}
+      {/* Right Section */}
       <form
         onSubmit={onSubmitHandler}
-        action=""
-        className="border-2 bg-white/10 text-white border-gray-500 p-6 flex flex-col gap-6 rounded-xl shadow-lg"
+        className="border-2 bg-white/8 text-white border-gray-500 p-6 flex flex-col gap-6 rounded-lg shadow-lg"
       >
         <h2 className="font-medium text-2xl flex justify-between items-center">
-          {currentState}
+          {currState}
           {isDataSubmitted && (
             <img
               onClick={() => setIsDataSubmitted(false)}
@@ -41,12 +53,12 @@ const LoginPage = () => {
           )}
         </h2>
 
-        {currentState === "Sign up" && !isDataSubmitted && (
+        {currState === "Sign up" && !isDataSubmitted && (
           <input
             onChange={(e) => setFullName(e.target.value)}
             value={fullName}
             type="text"
-            className="p-2 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="p-2 border border-gray-500 rounded-md focus:outline-none"
             placeholder="Full Name"
             required
           />
@@ -59,63 +71,58 @@ const LoginPage = () => {
               value={email}
               type="email"
               placeholder="Email Address"
-              required
               className="p-2 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
-
             <input
               onChange={(e) => setPassword(e.target.value)}
               value={password}
               type="password"
               placeholder="Password"
-              required
               className="p-2 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </>
         )}
 
-        {currentState === "Sign up" && isDataSubmitted && (
+        {currState === "Sign up" && isDataSubmitted && (
           <textarea
             onChange={(e) => setBio(e.target.value)}
             value={bio}
             rows={4}
-            placeholder="Provide a short bio..."
             className="p-2 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            placeholder="Provide a short Bio..."
+            required
           ></textarea>
         )}
 
         <button
           type="submit"
-          className="py-3 bg-gradient-to-r from-purple-400 to-violet-600 text-white font-semibold rounded-md shadow-md hover:opacity-90 transition"
+          className="py-3 bg-gradient-to-r from-purple-400 to-violet-600 text-white rounded-md cursor-pointer"
         >
-          {currentState === "Sign up" ? "Create Account" : "Login Now"}
+          {currState === "Sign up" ? "Create Account" : "Login Now"}
         </button>
 
-        <div className="flex items-center gap-2 text-sm">
-          <input type="checkbox" className="w-4 h-4 accent-violet-500" />
+        <div className="flex items-center gap-2 text-sm text-gray-500">
+          <input type="checkbox" />
           <p>Agree to the terms of use & privacy policy.</p>
         </div>
 
         <div className="flex flex-col gap-2">
-          {currentState === "Sign up" ? (
-            <p className="text-sm text-gray-300">
-              Already have an account?
+          {currState === "Sign up" ? (
+            <p className="text-sm text-white-600">
+              Already have an account?{" "}
               <span
-                onClick={() => {
-                  setCurrentState("Login");
-                  setIsDataSubmitted(false);
-                }}
-                className="font-medium text-violet-400 cursor-pointer hover:underline"
+                onClick={() => setCurrState("Login")}
+                className="font-medium text-violet-500 cursor-pointer"
               >
-                Login here
+                Login Here
               </span>
             </p>
           ) : (
-            <p className="text-sm text-gray-300">
+            <p className="text-sm text-white-600">
               Create an account{" "}
               <span
-                onClick={() => setCurrentState("Sign up")}
-                className="font-medium text-violet-400 cursor-pointer hover:underline"
+                onClick={() => setCurrState("Sign up")}
+                className="font-medium text-violet-500 cursor-pointer"
               >
                 Click here
               </span>

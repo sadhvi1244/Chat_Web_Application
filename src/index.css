@@ -8,3 +8,9 @@
 ::-webkit-scrollbar {
   display: none;
 }
+
+@theme {
+  /* Define a custom strong blur value */
+  --blur-5xl: 600px;
+  --blur-s: 2.7px;
+}
